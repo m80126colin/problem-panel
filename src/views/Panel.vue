@@ -32,7 +32,11 @@
       <div class="ui items">
       <div class="item">
         <div class="content">
-          <div class="header">{{ prob.judge }} {{ prob.id }}</div>
+          <div class="header">{{ prob.name }}</div>
+          <div class="meta">
+            <a v-if="prob.link" :href="prob.link" class="ui blue circular empty label" target="_blank"></a>
+            {{ prob.judge }} {{ prob.id }}
+          </div>
           <div class="description">
             <span v-for="tag in prob.tag" :key="`pt-${prob.judge}-${prob.id}-${tag}`"
               class="ui basic circular label">{{ tag }}</span>
@@ -50,6 +54,20 @@
 import _ from 'lodash';
 import axios from 'axios';
 
+const renderLink = row => {
+  switch (row.judge) {
+    case 'ZeroJudge':
+      return `https://zerojudge.tw/ShowProblem?problemid=${row.id}`
+    case 'TIOJ':
+      return `https://tioj.ck.tp.edu.tw/problems/${row.id}`
+    case 'CodeForces':
+      const first = _.chain(row.id).initial().join('').value()
+      return `https://codeforces.com/problemset/problem/${first}/${row.id.substr(-1)}`
+    default:
+      return undefined
+  }
+}
+
 export default {
   data() {
     return {
@@ -60,8 +78,8 @@ export default {
   },
   async mounted() {
     const app = this
-    const { data } = await axios.get('//m80126colin.github.io/Judge/data.json')
-    app.list = data
+    const { data : rows } = await axios.get('//m80126colin.github.io/Judge/data.json')
+    app.list = _.map(rows, row => _.merge(row, { link: renderLink(row) }))
     $('.ui.dropdown').dropdown({ clearable: true })
   },
   computed: {
