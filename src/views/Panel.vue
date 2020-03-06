@@ -60,7 +60,7 @@ export default {
   },
   async mounted() {
     const app = this
-    const { data } = await axios.get('http://m80126colin.github.io/Judge/data.json')
+    const { data } = await axios.get('//m80126colin.github.io/Judge/data.json')
     app.list = data
     $('.ui.dropdown').dropdown({ clearable: true })
   },
